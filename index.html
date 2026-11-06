@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cycle Buddy</title>
+<meta name="theme-color" content="#5B2E91">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cycle Buddy">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F5F2F9;--card:#fff;--ink:#271F33;--mute:#6B6178;--line:#E4DEEC;--accent:#5B2E91;--on:#fff;--per:#C42E5C;--fol:#1F8A76;--ovu:#C97F0A;--lut:#6B5BC4;--pms:#D4502D;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -118,7 +125,7 @@ const SUG={
 };
 const GEN={food:'a comfort snack',drink:'a warm drink',act:'something relaxing'};
 let lang='en';
-const IT={'Home':'Home','Calendar':'Calendario','Friends':'Amiche','Period':'Mestruazioni','Follicular':'Follicolare','Ovulation':'Ovulazione','Luteal':'Luteale','PMS':'PMS',
+const IT={'On iPhone, add the app to your Home Screen first, then open it from there. ':'Su iPhone, aggiungi prima l\u2019app alla schermata Home e aprila da l\u00ec. ','Home':'Home','Calendar':'Calendario','Friends':'Amiche','Period':'Mestruazioni','Follicular':'Follicolare','Ovulation':'Ovulazione','Luteal':'Luteale','PMS':'PMS',
 'Cramps, tiredness and low mood are common. Comfort beats cheerfulness.':'Crampi, stanchezza e umore basso sono comuni. Meglio il conforto dell’allegria forzata.',
 'Energy and mood usually climb. Good time for plans.':'Energia e umore di solito salgono. Buon momento per fare programmi.',
 'Often a high-energy, sociable stretch for a couple of days.':'Spesso un paio di giorni pieni di energia e voglia di socializzare.',
@@ -278,13 +285,16 @@ function settings(){
  <h2>${T('Notifications')}</h2>
  <label class="field">${T('Remind me at')}<input data-s="time" type="time" value="${st.time}"></label>
  <div class="two"><button class="cta" style="background:var(--accent);color:var(--on)" data-act="notif">${T(st.notif?'Turn off':'Turn on')}</button><button class="cta alt" style="margin-top:0" data-act="test">${T('Send a test')}</button></div>
- <p class="note">${T('Browsers only allow notifications from a page like this while it’s open (even in the background), and some phones don’t allow them at all. Today’s heads-up always appears at the top of Home.')}</p></div>`;
+ <p class="note">${T('On iPhone, add the app to your Home Screen first, then open it from there. ')}${T('Browsers only allow notifications from a page like this while it’s open (even in the background), and some phones don’t allow them at all. Today’s heads-up always appears at the top of Home.')}</p></div>`;
 }
-function notify(title,body,test){
+async function notify(title,body,test){
  try{
   if(!('Notification' in window)||Notification.permission!=='granted')throw 0;
-  new Notification(title,{body});return true;
- }catch(e){if(test)toast(T('Notifications are blocked or not supported here. You’ll still see heads-ups on Home.'));return false}
+  const reg=('serviceWorker' in navigator)?await navigator.serviceWorker.getRegistration():null;
+  if(reg&&reg.showNotification){await reg.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'})}
+  else{new Notification(title,{body})}
+  return true;
+ }catch(e){if(test)toast(T('Notifications are blocked or not supported here. You\u2019ll still see heads-ups on Home.'));return false}
 }
 async function enableNotif(){
  try{
@@ -294,14 +304,14 @@ async function enableNotif(){
   st.notif=true;save();render();toast(T('Notifications on'));checkNotify();
  }catch(e){toast(T('Notifications are blocked or not supported here. You’ll still see heads-ups on Home.'))}
 }
-function checkNotify(){
+async function checkNotify(){
  if(!st.notif)return;
  const d=new Date(),hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
  if(hm<st.time)return;
  let ch=false;
  for(const f of st.friends)for(const e of events(f,today())){
   if(st.sent.includes(e.k))continue;
-  if(notify('Cycle Buddy',e.msg)){st.sent.push(e.k);ch=true}
+  if(await notify('Cycle Buddy',e.msg)){st.sent.push(e.k);ch=true}
  }
  if(ch){st.sent=st.sent.slice(-60);save()}
 }
@@ -355,5 +365,6 @@ document.addEventListener('input',e=>{
 });
 render();
 </script>
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
 </body>
 </html>
