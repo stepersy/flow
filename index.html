@@ -85,6 +85,8 @@ select,input{width:100%;background:var(--card);border:1.5px solid var(--line);bo
 .sheet>div{background:var(--bg);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
 .sheet h2{margin-bottom:14px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20;max-width:90%}
+.card:not(.open)>.body{display:none}
+.card.open>.body{display:block;padding-top:4px}
 </style>
 </head>
 <body>
@@ -125,24 +127,24 @@ const SUG={
 };
 const GEN={food:'a comfort snack',drink:'a warm drink',act:'something relaxing'};
 let lang='en';
-const IT={'On iPhone, add the app to your Home Screen first, then open it from there. ':'Su iPhone, aggiungi prima l\u2019app alla schermata Home e aprila da l\u00ec. ','Home':'Home','Calendar':'Calendario','Friends':'Amiche','Period':'Mestruazioni','Follicular':'Follicolare','Ovulation':'Ovulazione','Luteal':'Luteale','PMS':'PMS',
+const IT={'Ramen':'Ramen','Ginger tea':'T\u00e8 allo zenzero','Cozy movie night':'Serata film sul divano','Cheesecake':'Cheesecake','Hot chocolate':'Cioccolata calda','Baking together':'Preparare dolci insieme','Chocolate':'Cioccolato','Iced latte':'Latte freddo','A long walk':'Una lunga passeggiata','On iPhone, add the app to your Home Screen first, then open it from there. ':'Su iPhone, aggiungi prima l\u2019app alla schermata Home e aprila da l\u00ec. ','Home':'Home','Calendar':'Calendario','Friends':'Amiche','Period':'Mestruazioni','Follicular':'Follicolare','Ovulation':'Ovulazione','Luteal':'Luteale','PMS':'PMS',
 'Cramps, tiredness and low mood are common. Comfort beats cheerfulness.':'Crampi, stanchezza e umore basso sono comuni. Meglio il conforto dell’allegria forzata.',
 'Energy and mood usually climb. Good time for plans.':'Energia e umore di solito salgono. Buon momento per fare programmi.',
 'Often a high-energy, sociable stretch for a couple of days.':'Spesso un paio di giorni pieni di energia e voglia di socializzare.',
 'Energy slowly dips. Steady and low-pressure is best.':'L’energia cala piano piano. Meglio la calma, senza pressioni.',
 'Irritability, tiredness, cravings and sensitivity are common right now.':'Irritabilità, stanchezza, voglie e sensibilità sono comuni in questa fase.',
 'a comfort snack':'qualcosa di goloso','a warm drink':'una bevanda calda','something relaxing':'qualcosa di rilassante',
-'Bring {food}, no strings attached':'Portale {food}, senza secondi fini','Offer a heating pad or {drink}':'Offrile una borsa dell’acqua calda o {drink}','Keep plans low-key. {act} at home works':'Programmi tranquilli: {act} a casa va benissimo','Listen first and skip the fixing':'Ascolta prima di tutto, senza cercare di risolvere',
+'Bring {food}, no strings attached':'Portale {food}, senza secondi fini','Offer a heating pad or {drink}':'Offrile una borsa dell’acqua calda o {drink}','Keep plans low-key. {act} at home works':'Programmi tranquilli: {act} va benissimo anche a casa','Listen first and skip the fixing':'Ascolta prima di tutto, senza cercare di risolvere',
 'Don’t joke about her discomfort':'Non scherzare sul suo malessere','Don’t ask “is it that time?” when she’s upset':'Non chiederle “hai le tue cose?” quando è giù','Don’t push her to be social or active':'Non spingerla a uscire o a fare sport','Don’t take cancelled plans personally':'Non prendere sul personale se annulla i piani',
-'Her energy is climbing, so suggest {act}':'L’energia sale: proponile {act}','Plan the outing she’s been putting off':'Organizza l’uscita che rimanda da un po’','Ask about her ideas and really listen':'Chiedile le sue idee e ascoltala davvero','Treat her to {drink} on the way':'Offrile {drink} lungo la strada',
+'Her energy is climbing, so suggest {act}':'L’energia sale: un’idea è {act}','Plan the outing she’s been putting off':'Organizza l’uscita che rimanda da un po’','Ask about her ideas and really listen':'Chiedile le sue idee e ascoltala davvero','Treat her to {drink} on the way':'Offrile {drink} lungo la strada',
 'Don’t assume she’s still low-energy':'Non dare per scontato che sia ancora senza energie','Don’t over-fuss now that she feels better':'Non stressarla con troppe premure ora che sta meglio','Don’t cancel plans last minute':'Non annullare i programmi all’ultimo',
-'Great day for a social plan. Suggest {act}':'Ottimo giorno per un programma insieme: proponile {act}','Bring {drink}, just because':'Portale {drink}, anche senza motivo','Be warm and attentive':'Sii caloroso e attento',
+'Great day for a social plan. Suggest {act}':'Ottimo giorno per uscire insieme: {act}','Bring {drink}, just because':'Portale {drink}, anche senza motivo','Be warm and attentive':'Sii caloroso e attento',
 'Don’t comment on her body or hormones':'Non commentare il suo corpo o i suoi ormoni','Don’t assume what she wants. Ask':'Non dare per scontato cosa voglia: chiedile','Don’t turn it into a joke about fertility':'Non farne una battuta sulla fertilità',
 'Keep routines steady and predictable':'Mantieni routine stabili e prevedibili','Take a chore off her plate without being asked':'Occupati di una faccenda al posto suo, senza che te lo chieda','Quietly stock {food} for the coming days':'Fai scorta di {food} per i prossimi giorni, in silenzio',
 'Don’t pick fights over small things':'Non litigare per le piccolezze','Don’t spring surprises that need lots of energy':'Non organizzare sorprese che richiedono tante energie','Don’t overload her calendar':'Non riempirle l’agenda',
-'Buy her {food}. Comfort food counts':'Comprale {food}. Il cibo del conforto conta','Offer a listening ear without judgment':'Ascoltala senza giudicare','Suggest something relaxing, like {act}':'Proponile un’attività rilassante, ad esempio {act}','Bring {drink} and a kind text':'Portale {drink} e scrivile un messaggio gentile','Be patient. A calm reply goes a long way':'Abbi pazienza. Una risposta calma fa miracoli',
+'Buy her {food}. Comfort food counts':'Comprale {food}. Il cibo del conforto conta','Offer a listening ear without judgment':'Ascoltala senza giudicare','Suggest something relaxing, like {act}':'Un’attività rilassante: {act}','Bring {drink} and a kind text':'Portale {drink} e scrivile un messaggio gentile','Be patient. A calm reply goes a long way':'Abbi pazienza. Una risposta calma fa miracoli',
 'Don’t make light of her discomfort':'Non sminuire il suo malessere','Don’t criticize her mood swings':'Non criticare i suoi sbalzi d’umore','Don’t say “you’re overreacting”':'Non dirle “stai esagerando”','Avoid sensitive topics like money, family or big decisions':'Evita argomenti delicati come soldi, famiglia o decisioni importanti',
-'Her energy is returning. Suggest something light, like {act}':'L’energia sta tornando: proponi qualcosa di leggero, come {act}',
+'Her energy is returning. Suggest something light, like {act}':'L’energia sta tornando: {act} potrebbe piacerle',
 'Today':'Oggi','No one here yet.':'Ancora nessuno qui.','Add a friend':'Aggiungi un’amica','Add friend':'Aggiungi amica','+ Add friend':'+ Aggiungi amica','Log a period start in Calendar to begin.':'Registra l’inizio delle mestruazioni nel Calendario per cominciare.',
 'Do':'Da fare','Don’t':'Da evitare','What she loves':'Cosa le piace','Comfort food':'Cibo del conforto','Drink':'Bevanda','Unwinds with':'Si rilassa con','Also':'Inoltre','day':'giorno',
 'Next period expected tomorrow':'Prossimo ciclo previsto domani','Next period in about {x} days':'Prossimo ciclo tra circa {x} giorni',
@@ -161,7 +163,7 @@ const IT={'On iPhone, add the app to your Home Screen first, then open it from t
 'Browsers only allow notifications from a page like this while it’s open (even in the background), and some phones don’t allow them at all. Today’s heads-up always appears at the top of Home.':'I browser consentono le notifiche da una pagina come questa solo mentre è aperta (anche in background), e alcuni telefoni non le consentono affatto. Gli avvisi di oggi compaiono sempre in cima alla Home.',
 'Today’s heads-up':'Avvisi di oggi','This is a test notification from Cycle Buddy.':'Questa è una notifica di prova da Cycle Buddy.',
 'Hey, today is the first day of {n}’s period. Remember to bring her {food}.':'Ehi, oggi sono iniziate le mestruazioni di {n}. Ricordati di portarle {food}.',
-'Today is the last day of {n}’s period. Her energy is coming back, so suggest {act}.':'Oggi è l’ultimo giorno di mestruazioni di {n}. L’energia sta tornando: proponile {act}.',
+'Today is the last day of {n}’s period. Her energy is coming back, so suggest {act}.':'Oggi è l’ultimo giorno di mestruazioni di {n}. L’energia sta tornando: {act} potrebbe piacerle.',
 'It’s {n}’s ovulation day! A good day for a plan together: {act}.':'Oggi è il giorno dell’ovulazione di {n}! Ottimo per un programma insieme: {act}.',
 '{n}’s PMS phase starts today. Be patient, and bring her {food}.':'Oggi inizia la fase PMS di {n}. Abbi pazienza e portale {food}.'};
 const T=(s,v)=>{let r=(lang==='it'&&IT[s])||s;if(v)for(const k in v)r=r.split('{'+k+'}').join(v[k]);return r};
@@ -177,7 +179,7 @@ let st=load();
 st.time=st.time||'09:00';st.sent=st.sent||[];
 lang=st.lang||((navigator.language||'').slice(0,2)==='it'?'it':'en');
 const now=new Date();
-const ui={tab:'home',open:null,y:now.getFullYear(),m:now.getMonth(),day:today(),del:null};
+const ui={tab:'home',open:null,y:now.getFullYear(),m:now.getMonth(),day:today(),del:null,editOpen:null};
 const cur=()=>st.friends.find(f=>f.id===st.sel)||st.friends[0];
 
 function cycLen(f){
@@ -195,7 +197,7 @@ function info(f,n){
 }
 function fill(t,f){
  let used=false;
- const h=esc(T(t)).replace(/\{(food|drink|act)\}/g,(m,k)=>{if(f[k]&&f[k].trim()){used=true;return '<strong>'+esc(f[k].trim())+'</strong>'}return T(GEN[k])});
+ const h=esc(T(t)).replace(/\{(food|drink|act)\}/g,(m,k)=>{if(f[k]&&f[k].trim()){used=true;return '<strong>'+esc(T(f[k].trim()))+'</strong>'}return T(GEN[k])});
  return{h,used};
 }
 function headline(f,i){
@@ -218,7 +220,7 @@ function card(f,t){
  const li=(a,c)=>a.map(x=>{const r=fill(x,f);return `<li class="${c}${r.used?' mine':''}"><span>${r.h}</span></li>`}).join('');
  let dos=li(s.do,'do');
  if(i.ph==='period'&&i.d===i.P)dos+=li([`Her energy is returning. Suggest something light, like {act}`],'do');
- const fav=[['Comfort food',f.food],['Drink',f.drink],['Unwinds with',f.act],['Also',f.extra]].filter(x=>x[1]&&x[1].trim()).map(x=>`<span>${T(x[0])}: ${esc(x[1])}</span>`).join('');
+ const fav=[['Comfort food',f.food],['Drink',f.drink],['Unwinds with',f.act],['Also',f.extra]].filter(x=>x[1]&&x[1].trim()).map(x=>`<span>${T(x[0])}: ${esc(T(x[1]))}</span>`).join('');
  const nxt=i.toNext<=1?T('Next period expected tomorrow'):T('Next period in about {x} days',{x:i.toNext});
  return `<article class="card${open?' open':''}" style="--c:var(${m.c})" data-id="${f.id}">
  <button class="head" data-act="toggle" aria-expanded="${open}"><div><span class="pill">${T(m.n)} · ${T('day')} ${i.d}</span><h2>${headline(f,i)}</h2><p>${nxt}</p></div>${chev}</button>
@@ -252,21 +254,25 @@ function cal(){
  return h;
 }
 function people(){
- const inp=(f,k,l,ph,type)=>`<label class="field">${T(l)}<input data-k="${k}" ${type?`type="${type}"`:''} value="${esc(f[k])}" placeholder="${T(ph||'')}"></label>`;
- return `<h1>${T('Friends')}</h1><p class="sub">${T('Add what she loves. It shows up in the tips on Home. Everything stays on this device.')}</p>`+settings()+
- st.friends.map(f=>`<article class="card" data-id="${f.id}" style="--c:var(--accent)"><div style="padding:16px">
+ const inp=(f,k,l,ph,type)=>`<label class="field">${T(l)}<input data-k="${k}" ${type?`type="${type}"`:''} value="${esc(f[k])}" placeholder="${esc(T(ph||''))}"></label>`;
+ const body=[...st.friends].reverse().map(f=>{
+  const open=ui.editOpen===f.id;
+  return `<article class="card${open?' open':''}" data-id="${f.id}" style="--c:var(--accent)">
+ <button class="head" data-act="fold" aria-expanded="${open}"><div><h2>${esc(f.name)||'…'}</h2><p>${T('Cycle length (days)')}: ${f.len} · ${T('Period length (days)')}: ${f.plen}</p></div>${chev}</button>
+ <div class="body">
  ${inp(f,'name','Name')}${inp(f,'food','Comfort food','e.g. Chocolate')}${inp(f,'drink','Favorite drink','e.g. Chai latte')}${inp(f,'act','Relaxing activity','e.g. Cozy movie night')}${inp(f,'extra','Anything else she loves','e.g. Sunflowers, lo-fi playlists')}
  <div class="two"><label class="field">${T('Cycle length (days)')}<input data-k="len" type="number" inputmode="numeric" min="21" max="45" value="${f.len}"></label><label class="field">${T('Period length (days)')}<input data-k="plen" type="number" inputmode="numeric" min="2" max="9" value="${f.plen}"></label></div>
  <p class="note" style="margin:0 0 12px">${T('Cycle length adjusts on its own once you log two or more periods (now {x} days).',{x:cycLen(f)})}</p>
- <button class="rm" data-act="del">${ui.del===f.id?T('Tap again to remove'):T('Remove {n}',{n:esc(f.name)})}</button></div></article>`).join('')+
- `<button class="add" data-act="add">${T('+ Add friend')}</button>`;
+ <button class="rm" data-act="del">${ui.del===f.id?T('Tap again to remove'):T('Remove {n}',{n:esc(f.name)})}</button></div></article>`;
+ }).join('');
+ return `<h1>${T('Friends')}</h1><p class="sub">${T('Add what she loves. It shows up in the tips on Home. Everything stays on this device.')}</p>`+settings()+body+`<button class="add" data-act="add">${T('+ Add friend')}</button>`;
 }
 function render(){
  document.documentElement.lang=lang;
  document.querySelectorAll('.tab').forEach(b=>{b.setAttribute('aria-current',b.dataset.tab===ui.tab);b.lastChild.textContent=T({home:'Home',cal:'Calendar',people:'Friends'}[b.dataset.tab])});
  $('#main').innerHTML=ui.tab==='home'?home():ui.tab==='cal'?cal():people();
 }
-const pref=(f,k)=>(f[k]||'').trim()||T(GEN[k]);
+const pref=(f,k)=>T((f[k]||'').trim())||T(GEN[k]);
 function events(f,t){
  const i=info(f,t);if(!i)return[];
  const v={n:f.name,food:pref(f,'food'),act:pref(f,'act')},o=[];
@@ -329,7 +335,8 @@ document.addEventListener('click',e=>{
  if(tb){ui.tab=tb.dataset.tab;ui.del=null;render();scrollTo(0,0);return}
  const b=e.target.closest('[data-act]');if(!b)return;
  const a=b.dataset.act,f=cur(),card=b.closest('[data-id]');
- if(a==='toggle'){const id=card.dataset.id;ui.open=ui.open===id?null:id;render()}
+ if(a==='fold'){const id=card.dataset.id;ui.editOpen=ui.editOpen===id?null:id;render()}
+ else if(a==='toggle'){const id=card.dataset.id;ui.open=ui.open===id?null:id;render()}
  else if(a==='add')openAdd();
  else if(a==='lang'){lang=st.lang=lang==='it'?'en':'it';save();render()}
  else if(a==='setlang'){lang=st.lang=b.dataset.v;save();render()}
@@ -339,7 +346,7 @@ document.addEventListener('click',e=>{
  else if(a==='save-add'){
   const name=$('#an').value.trim();if(!name){$('#an').focus();return}
   const n={id:uid(),name,food:'',drink:'',act:'',extra:'',len:28,plen:5,starts:[$('#ad').value||iso(today()-10)]};
-  st.friends.push(n);st.sel=n.id;save();document.querySelector('.sheet').remove();
+  st.friends.push(n);st.sel=n.id;ui.editOpen=n.id;save();document.querySelector('.sheet').remove();
   if(ui.tab==='people'||ui.tab==='cal'){render()}else{ui.tab='cal';render()}
   toast(T('{n} added. Fill in her favorites on the Friends page.',{n:name}));
  }
