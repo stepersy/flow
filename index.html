@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cycle Buddy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F2F9;--card:#fff;--ink:#271F33;--mute:#6B6178;--line:#E4DEEC;--accent:#5B2E91;--on:#fff;--per:#C42E5C;--fol:#1F8A76;--ovu:#C97F0A;--lut:#6B5BC4;--pms:#D4502D;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17121F;--card:#231C2F;--ink:#F1ECF7;--mute:#A99DBA;--line:#382E48;--accent:#B99CF0;--on:#17121F;--per:#F0587F;--fol:#4CC2AC;--ovu:#F2B445;--lut:#9A8DEB;--pms:#F28063;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17121F;--card:#231C2F;--ink:#F1ECF7;--mute:#A99DBA;--line:#382E48;--accent:#B99CF0;--on:#17121F;--per:#F0587F;--fol:#4CC2AC;--ovu:#F2B445;--lut:#9A8DEB;--pms:#F28063;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif}
+#main{max-width:520px;margin:0 auto;padding:20px 16px 110px}
+h1,h2{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;line-height:1.15}
+h1{font-size:30px}h2{font-size:20px}
+.sub{color:var(--mute);margin:4px 0 18px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card{--c:var(--accent);background:var(--card);border:1px solid var(--line);border-left:8px solid var(--c);border-radius:18px;margin-bottom:12px;overflow:hidden}
+.head{all:unset;box-sizing:border-box;display:flex;width:100%;gap:12px;align-items:center;padding:16px;cursor:pointer}
+.head>div{flex:1}
+.head h2{font-size:19px}
+.head p{margin:4px 0 0;color:var(--mute);font-size:14px}
+.pill{display:inline-block;background:color-mix(in srgb,var(--c) 16%,var(--card));color:var(--c);font-weight:700;font-size:13px;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+.chev{width:22px;height:22px;transition:transform .2s;color:var(--mute)}
+.open .chev{transform:rotate(180deg)}
+.body{display:none;padding:0 16px 18px}
+.open .body{display:block;animation:in .2s ease}
+@keyframes in{from{opacity:0;transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.open .body{animation:none}.chev{transition:none}}
+.body h3{font-size:15px;margin:14px 0 6px}
+.body ul{list-style:none;margin:0;padding:0}
+.body li{display:flex;gap:10px;padding:8px 10px;border-radius:10px;margin-bottom:4px;background:color-mix(in srgb,var(--c) 7%,var(--card))}
+.body li:before{font-weight:700;flex:none;width:18px}
+.body li.do:before{content:"✓";color:var(--fol)}
+.body li.dont:before{content:"✕";color:var(--per)}
+.body li.mine{box-shadow:inset 3px 0 0 var(--c)}
+.tip{color:var(--mute);font-size:14px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:13px}
+.note{color:var(--mute);font-size:13px;margin-top:16px}
+.bar{display:flex;gap:10px;margin-bottom:14px}
+select,input{width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.bar select{font-weight:700;font-size:18px}
+.plus{flex:none;width:52px;border:0;border-radius:12px;background:var(--accent);color:var(--on);font-size:28px;line-height:1}
+.mon{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mon button{background:var(--card);border:1px solid var(--line);border-radius:12px;width:48px;height:44px;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.grid>span{text-align:center;color:var(--mute);font-size:12px;padding:4px 0}
+.day{position:relative;aspect-ratio:1;border:2px solid transparent;border-radius:12px;background:var(--card);font-weight:500;padding:0}
+.day[data-ph]{--c:var(--accent);background:color-mix(in srgb,var(--c) 24%,var(--card))}
+.day[data-ph=period]{--c:var(--per)}.day[data-ph=follicular]{--c:var(--fol)}.day[data-ph=ovulation]{--c:var(--ovu)}.day[data-ph=luteal]{--c:var(--lut)}.day[data-ph=pms]{--c:var(--pms)}
+.day[data-today]{border-color:var(--ink);font-weight:700}
+.day[aria-pressed=true]{box-shadow:0 0 0 3px var(--accent)}
+.day b{position:absolute;bottom:4px;left:50%;margin-left:-3px;width:6px;height:6px;border-radius:50%;background:var(--per)}
+.day u{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--ovu)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 0;font-size:13px;color:var(--mute)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.panel h2{font-size:18px}.panel p{margin:4px 0 14px;color:var(--mute)}
+.cta{width:100%;min-height:52px;border:0;border-radius:14px;background:var(--per);color:#fff;font-weight:700;font-size:17px}
+.cta.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line);margin-top:8px;font-weight:500;font-size:15px}
+.field{display:block;margin-bottom:12px;font-size:14px;font-weight:700}
+.field input{margin-top:4px;font-weight:400}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rm{background:none;border:1.5px solid var(--line);border-radius:12px;min-height:44px;padding:0 14px;color:var(--per);font-weight:700}
+.add{width:100%;min-height:52px;border:2px dashed var(--accent);border-radius:14px;background:none;color:var(--accent);font-weight:700;font-size:16px;margin-top:4px}
+.empty{text-align:center;padding:40px 10px;color:var(--mute)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.lang{flex:none;min-width:48px;min-height:44px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-weight:700}.seg{display:flex;gap:8px;margin-bottom:12px}.seg button{flex:1;min-height:46px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-weight:700}.seg button[aria-pressed=true]{background:var(--accent);color:var(--on);border-color:var(--accent)}.alert{background:color-mix(in srgb,var(--accent) 12%,var(--card));border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:14px}.alert h2{font-size:16px;margin-bottom:6px}.alert p{margin:6px 0 0}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+.tab{flex:1;max-width:180px;margin:0 auto;background:none;border:0;border-radius:12px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:var(--mute)}
+.tab svg{width:24px;height:24px}
+.tab[aria-current=true]{color:var(--accent)}
+.sheet{position:fixed;inset:0;background:rgba(20,10,30,.5);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet>div{background:var(--bg);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet h2{margin-bottom:14px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20;max-width:90%}
+</style>
+</head>
+<body>
+<main id="main"></main>
+<nav class="tabs" aria-label="Pages">
+<button class="tab" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+<button class="tab" data-tab="cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Calendar</button>
+<button class="tab" data-tab="people"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 4a4 4 0 0 1 0 8M22 21c0-3-1.5-5-4-5.700"/></svg>Friends</button>
+</nav>
+<script>
+const KEY='cyclebuddy:v1',DAY=864e5,$=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dn=d=>Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/DAY);
+const iso=n=>new Date(n*DAY).toISOString().slice(0,10);
+const parse=s=>{const[y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)/DAY};
+const today=()=>dn(new Date());
+const uid=()=>'f'+Math.random().toString(36).slice(2,8);
+const fmt=(n,o)=>new Date(n*DAY).toLocaleDateString(lang,Object.assign({timeZone:'UTC'},o));
+
+const PH={
+ period:{n:'Period',c:'--per',tip:'Cramps, tiredness and low mood are common. Comfort beats cheerfulness.'},
+ follicular:{n:'Follicular',c:'--fol',tip:'Energy and mood usually climb. Good time for plans.'},
+ ovulation:{n:'Ovulation',c:'--ovu',tip:'Often a high-energy, sociable stretch for a couple of days.'},
+ luteal:{n:'Luteal',c:'--lut',tip:'Energy slowly dips. Steady and low-pressure is best.'},
+ pms:{n:'PMS',c:'--pms',tip:'Irritability, tiredness, cravings and sensitivity are common right now.'}
+};
+const SUG={
+ period:{do:[`Bring {food}, no strings attached`,`Offer a heating pad or {drink}`,`Keep plans low-key. {act} at home works`,`Listen first and skip the fixing`],
+  dont:[`Don’t joke about her discomfort`,`Don’t ask “is it that time?” when she’s upset`,`Don’t push her to be social or active`,`Don’t take cancelled plans personally`]},
+ follicular:{do:[`Her energy is climbing, so suggest {act}`,`Plan the outing she’s been putting off`,`Ask about her ideas and really listen`,`Treat her to {drink} on the way`],
+  dont:[`Don’t assume she’s still low-energy`,`Don’t over-fuss now that she feels better`,`Don’t cancel plans last minute`]},
+ ovulation:{do:[`Great day for a social plan. Suggest {act}`,`Bring {drink}, just because`,`Be warm and attentive`],
+  dont:[`Don’t comment on her body or hormones`,`Don’t assume what she wants. Ask`,`Don’t turn it into a joke about fertility`]},
+ luteal:{do:[`Keep routines steady and predictable`,`Take a chore off her plate without being asked`,`Quietly stock {food} for the coming days`],
+  dont:[`Don’t pick fights over small things`,`Don’t spring surprises that need lots of energy`,`Don’t overload her calendar`]},
+ pms:{do:[`Buy her {food}. Comfort food counts`,`Offer a listening ear without judgment`,`Suggest something relaxing, like {act}`,`Bring {drink} and a kind text`,`Be patient. A calm reply goes a long way`],
+  dont:[`Don’t make light of her discomfort`,`Don’t criticize her mood swings`,`Don’t say “you’re overreacting”`,`Avoid sensitive topics like money, family or big decisions`]}
+};
+const GEN={food:'a comfort snack',drink:'a warm drink',act:'something relaxing'};
+let lang='en';
+const IT={'Home':'Home','Calendar':'Calendario','Friends':'Amiche','Period':'Mestruazioni','Follicular':'Follicolare','Ovulation':'Ovulazione','Luteal':'Luteale','PMS':'PMS',
+'Cramps, tiredness and low mood are common. Comfort beats cheerfulness.':'Crampi, stanchezza e umore basso sono comuni. Meglio il conforto dell’allegria forzata.',
+'Energy and mood usually climb. Good time for plans.':'Energia e umore di solito salgono. Buon momento per fare programmi.',
+'Often a high-energy, sociable stretch for a couple of days.':'Spesso un paio di giorni pieni di energia e voglia di socializzare.',
+'Energy slowly dips. Steady and low-pressure is best.':'L’energia cala piano piano. Meglio la calma, senza pressioni.',
+'Irritability, tiredness, cravings and sensitivity are common right now.':'Irritabilità, stanchezza, voglie e sensibilità sono comuni in questa fase.',
+'a comfort snack':'qualcosa di goloso','a warm drink':'una bevanda calda','something relaxing':'qualcosa di rilassante',
+'Bring {food}, no strings attached':'Portale {food}, senza secondi fini','Offer a heating pad or {drink}':'Offrile una borsa dell’acqua calda o {drink}','Keep plans low-key. {act} at home works':'Programmi tranquilli: {act} a casa va benissimo','Listen first and skip the fixing':'Ascolta prima di tutto, senza cercare di risolvere',
+'Don’t joke about her discomfort':'Non scherzare sul suo malessere','Don’t ask “is it that time?” when she’s upset':'Non chiederle “hai le tue cose?” quando è giù','Don’t push her to be social or active':'Non spingerla a uscire o a fare sport','Don’t take cancelled plans personally':'Non prendere sul personale se annulla i piani',
+'Her energy is climbing, so suggest {act}':'L’energia sale: proponile {act}','Plan the outing she’s been putting off':'Organizza l’uscita che rimanda da un po’','Ask about her ideas and really listen':'Chiedile le sue idee e ascoltala davvero','Treat her to {drink} on the way':'Offrile {drink} lungo la strada',
+'Don’t assume she’s still low-energy':'Non dare per scontato che sia ancora senza energie','Don’t over-fuss now that she feels better':'Non stressarla con troppe premure ora che sta meglio','Don’t cancel plans last minute':'Non annullare i programmi all’ultimo',
+'Great day for a social plan. Suggest {act}':'Ottimo giorno per un programma insieme: proponile {act}','Bring {drink}, just because':'Portale {drink}, anche senza motivo','Be warm and attentive':'Sii caloroso e attento',
+'Don’t comment on her body or hormones':'Non commentare il suo corpo o i suoi ormoni','Don’t assume what she wants. Ask':'Non dare per scontato cosa voglia: chiedile','Don’t turn it into a joke about fertility':'Non farne una battuta sulla fertilità',
+'Keep routines steady and predictable':'Mantieni routine stabili e prevedibili','Take a chore off her plate without being asked':'Occupati di una faccenda al posto suo, senza che te lo chieda','Quietly stock {food} for the coming days':'Fai scorta di {food} per i prossimi giorni, in silenzio',
+'Don’t pick fights over small things':'Non litigare per le piccolezze','Don’t spring surprises that need lots of energy':'Non organizzare sorprese che richiedono tante energie','Don’t overload her calendar':'Non riempirle l’agenda',
+'Buy her {food}. Comfort food counts':'Comprale {food}. Il cibo del conforto conta','Offer a listening ear without judgment':'Ascoltala senza giudicare','Suggest something relaxing, like {act}':'Proponile un’attività rilassante, ad esempio {act}','Bring {drink} and a kind text':'Portale {drink} e scrivile un messaggio gentile','Be patient. A calm reply goes a long way':'Abbi pazienza. Una risposta calma fa miracoli',
+'Don’t make light of her discomfort':'Non sminuire il suo malessere','Don’t criticize her mood swings':'Non criticare i suoi sbalzi d’umore','Don’t say “you’re overreacting”':'Non dirle “stai esagerando”','Avoid sensitive topics like money, family or big decisions':'Evita argomenti delicati come soldi, famiglia o decisioni importanti',
+'Her energy is returning. Suggest something light, like {act}':'L’energia sta tornando: proponi qualcosa di leggero, come {act}',
+'Today':'Oggi','No one here yet.':'Ancora nessuno qui.','Add a friend':'Aggiungi un’amica','Add friend':'Aggiungi amica','+ Add friend':'+ Aggiungi amica','Log a period start in Calendar to begin.':'Registra l’inizio delle mestruazioni nel Calendario per cominciare.',
+'Do':'Da fare','Don’t':'Da evitare','What she loves':'Cosa le piace','Comfort food':'Cibo del conforto','Drink':'Bevanda','Unwinds with':'Si rilassa con','Also':'Inoltre','day':'giorno',
+'Next period expected tomorrow':'Prossimo ciclo previsto domani','Next period in about {x} days':'Prossimo ciclo tra circa {x} giorni',
+'Highlighted tips use her favorites from the Friends page.':'I consigli evidenziati usano i suoi gusti dalla pagina Amiche.',
+'Predictions are estimates, not medical advice. If she tells you how she feels, believe her over the app.':'Le previsioni sono stime, non consigli medici. Se lei ti dice come si sente, credi a lei più che all’app.',
+'{n}’s period started today':'Oggi sono iniziate le mestruazioni di {n}','{n} is on the last day of her period':'{n} è all’ultimo giorno di mestruazioni','{n} is on her period (day {d})':'{n} ha le mestruazioni (giorno {d})','It’s {n}’s ovulation day!':'Oggi è il giorno dell’ovulazione di {n}!','{n} is around ovulation':'{n} è vicina all’ovulazione','{n} is currently in PMS phase':'{n} è in fase PMS','{n} is in her luteal phase':'{n} è in fase luteale','{n} is in her follicular phase':'{n} è in fase follicolare',
+'Choose friend':'Scegli un’amica','No friends yet':'Nessuna amica','Previous month':'Mese precedente','Next month':'Mese successivo','Ovulation day':'Giorno di ovulazione',
+'{ph} phase, day {d} of {L}':'Fase {ph}, giorno {d} di {L}',' (predicted)':' (previsto)','No data yet':'Ancora nessun dato','. Period start logged':'. Inizio ciclo registrato','Remove this period start':'Rimuovi questo inizio ciclo','Period started today?':'Mestruazioni iniziate oggi?','Period started this day?':'Mestruazioni iniziate in questo giorno?',
+'Add what she loves. It shows up in the tips on Home. Everything stays on this device.':'Aggiungi ciò che le piace: comparirà nei consigli della Home. Tutto resta su questo dispositivo.',
+'Name':'Nome','Favorite drink':'Bevanda preferita','Relaxing activity':'Attività rilassante','Anything else she loves':'Altro che le piace','e.g. Chocolate':'es. Cioccolato','e.g. Chai latte':'es. Chai latte','e.g. Cozy movie night':'es. Serata film sul divano','e.g. Sunflowers, lo-fi playlists':'es. Girasoli, playlist rilassanti',
+'Cycle length (days)':'Durata del ciclo (giorni)','Period length (days)':'Durata delle mestruazioni (giorni)','Cycle length adjusts on its own once you log two or more periods (now {x} days).':'La durata del ciclo si aggiorna da sola dopo due o più cicli registrati (ora {x} giorni).','Tap again to remove':'Tocca di nuovo per rimuovere','Remove {n}':'Rimuovi {n}',
+'Her name':'Il suo nome','When did her last period start?':'Quando sono iniziate le sue ultime mestruazioni?','Cancel':'Annulla',
+'{n} added. Fill in her favorites on the Friends page.':'{n} aggiunta. Inserisci i suoi gusti nella pagina Amiche.','Period start saved for {n}':'Inizio ciclo salvato per {n}','Period start removed':'Inizio ciclo rimosso',
+'Language':'Lingua','Notifications':'Notifiche','Remind me at':'Avvisami alle','Turn on':'Attiva le notifiche','Turn off':'Disattiva le notifiche','Send a test':'Invia una prova','Notifications on':'Notifiche attive','Notifications off':'Notifiche disattivate',
+'Notifications are blocked or not supported here. You’ll still see heads-ups on Home.':'Le notifiche sono bloccate o non supportate qui. Vedrai comunque gli avvisi nella Home.',
+'Browsers only allow notifications from a page like this while it’s open (even in the background), and some phones don’t allow them at all. Today’s heads-up always appears at the top of Home.':'I browser consentono le notifiche da una pagina come questa solo mentre è aperta (anche in background), e alcuni telefoni non le consentono affatto. Gli avvisi di oggi compaiono sempre in cima alla Home.',
+'Today’s heads-up':'Avvisi di oggi','This is a test notification from Cycle Buddy.':'Questa è una notifica di prova da Cycle Buddy.',
+'Hey, today is the first day of {n}’s period. Remember to bring her {food}.':'Ehi, oggi sono iniziate le mestruazioni di {n}. Ricordati di portarle {food}.',
+'Today is the last day of {n}’s period. Her energy is coming back, so suggest {act}.':'Oggi è l’ultimo giorno di mestruazioni di {n}. L’energia sta tornando: proponile {act}.',
+'It’s {n}’s ovulation day! A good day for a plan together: {act}.':'Oggi è il giorno dell’ovulazione di {n}! Ottimo per un programma insieme: {act}.',
+'{n}’s PMS phase starts today. Be patient, and bring her {food}.':'Oggi inizia la fase PMS di {n}. Abbi pazienza e portale {food}.'};
+const T=(s,v)=>{let r=(lang==='it'&&IT[s])||s;if(v)for(const k in v)r=r.split('{'+k+'}').join(v[k]);return r};
+
+function seed(){
+ const t=today(),mk=(name,food,drink,act,ago,extra)=>({id:uid(),name,food,drink,act,extra,len:28,plen:5,starts:[iso(t-ago-28),iso(t-ago)]});
+ const f=[mk('Alissa','Ramen','Ginger tea','Cozy movie night',25,''),mk('Cecil','Cheesecake','Hot chocolate','Baking together',4,''),mk('Sophie','Chocolate','Iced latte','A long walk',13,'')];
+ return{friends:f,sel:f[0].id};
+}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.friends))return r}catch(e){}return seed()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+let st=load();
+st.time=st.time||'09:00';st.sent=st.sent||[];
+lang=st.lang||((navigator.language||'').slice(0,2)==='it'?'it':'en');
+const now=new Date();
+const ui={tab:'home',open:null,y:now.getFullYear(),m:now.getMonth(),day:today(),del:null};
+const cur=()=>st.friends.find(f=>f.id===st.sel)||st.friends[0];
+
+function cycLen(f){
+ const s=f.starts.map(parse).sort((a,b)=>a-b),g=[];
+ for(let i=Math.max(1,s.length-3);i<s.length;i++){const x=s[i]-s[i-1];if(x>=20&&x<=45)g.push(x)}
+ return g.length?Math.round(g.reduce((a,b)=>a+b,0)/g.length):f.len;
+}
+function info(f,n){
+ if(!f.starts.length)return null;
+ const s=f.starts.map(parse).sort((a,b)=>a-b),L=cycLen(f),P=f.plen;
+ let base=s[0];for(const x of s)if(x<=n)base=x;
+ const d=(((n-base)%L)+L)%L+1,ov=L-14;
+ const ph=d<=P?'period':(d>=ov-1&&d<=ov+1)?'ovulation':d>L-5?'pms':d>ov+1?'luteal':'follicular';
+ return{d,L,P,ov,ph,toNext:L-d+1};
+}
+function fill(t,f){
+ let used=false;
+ const h=esc(T(t)).replace(/\{(food|drink|act)\}/g,(m,k)=>{if(f[k]&&f[k].trim()){used=true;return '<strong>'+esc(f[k].trim())+'</strong>'}return T(GEN[k])});
+ return{h,used};
+}
+function headline(f,i){
+ const n=esc(f.name);
+ if(i.ph==='period')return T(i.d===1?'{n}’s period started today':i.d===i.P?'{n} is on the last day of her period':'{n} is on her period (day {d})',{n,d:i.d});
+ if(i.ph==='ovulation')return T(i.d===i.ov?'It’s {n}’s ovulation day!':'{n} is around ovulation',{n});
+ if(i.ph==='pms')return T('{n} is currently in PMS phase',{n});
+ if(i.ph==='luteal')return T('{n} is in her luteal phase',{n});
+ return T('{n} is in her follicular phase',{n});
+}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;t.setAttribute('role','status');document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+
+const empty=()=>`<div class="empty"><p>${T('No one here yet.')}</p><button class="add" data-act="add">${T('Add a friend')}</button></div>`;
+const chev='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+
+function card(f,t){
+ const i=info(f,t);
+ if(!i)return `<article class="card"><div class="head"><div><h2>${esc(f.name)}</h2><p>${T('Log a period start in Calendar to begin.')}</p></div></div></article>`;
+ const m=PH[i.ph],open=ui.open===f.id,s=SUG[i.ph];
+ const li=(a,c)=>a.map(x=>{const r=fill(x,f);return `<li class="${c}${r.used?' mine':''}"><span>${r.h}</span></li>`}).join('');
+ let dos=li(s.do,'do');
+ if(i.ph==='period'&&i.d===i.P)dos+=li([`Her energy is returning. Suggest something light, like {act}`],'do');
+ const fav=[['Comfort food',f.food],['Drink',f.drink],['Unwinds with',f.act],['Also',f.extra]].filter(x=>x[1]&&x[1].trim()).map(x=>`<span>${T(x[0])}: ${esc(x[1])}</span>`).join('');
+ const nxt=i.toNext<=1?T('Next period expected tomorrow'):T('Next period in about {x} days',{x:i.toNext});
+ return `<article class="card${open?' open':''}" style="--c:var(${m.c})" data-id="${f.id}">
+ <button class="head" data-act="toggle" aria-expanded="${open}"><div><span class="pill">${T(m.n)} · ${T('day')} ${i.d}</span><h2>${headline(f,i)}</h2><p>${nxt}</p></div>${chev}</button>
+ <div class="body"><p class="tip">${T(m.tip)}</p>
+ <h3>${T('Do')}</h3><ul>${dos}</ul><h3>${T('Don’t')}</h3><ul>${li(s.dont,'dont')}</ul>
+ ${fav?`<h3>${T('What she loves')}</h3><div class="chips">${fav}</div>`:''}
+ <p class="note">${T('Highlighted tips use her favorites from the Friends page.')}</p></div></article>`;
+}
+function home(){
+ const t=today();
+ return `<div class="top"><div><h1>${T('Today')}</h1><p class="sub">${fmt(t,{weekday:'long',day:'numeric',month:'long'})}</p></div><button class="lang" data-act="lang" aria-label="${T('Language')}">${lang==='it'?'EN':'IT'}</button></div>`+alerts(t)+
+  (st.friends.length?st.friends.map(f=>card(f,t)).join('')+`<p class="note">${T('Predictions are estimates, not medical advice. If she tells you how she feels, believe her over the app.')}</p>`:empty());
+}
+function cal(){
+ const f=cur(),t=today();
+ let h=`<div class="bar"><select id="fsel" aria-label="${T('Choose friend')}">${st.friends.map(x=>`<option value="${x.id}"${f&&x.id===f.id?' selected':''}>${esc(x.name)}</option>`).join('')||`<option>${T('No friends yet')}</option>`}</select><button class="plus" data-act="add" aria-label="${T('Add friend')}">+</button></div>`;
+ if(!f)return h+empty();
+ const pad=(new Date(ui.y,ui.m,1).getDay()+6)%7,days=new Date(ui.y,ui.m+1,0).getDate(),starts=new Set(f.starts);
+ let c='';for(let k=0;k<pad;k++)c+='<i></i>';
+ for(let d=1;d<=days;d++){
+  const n=dn(new Date(ui.y,ui.m,d)),i=info(f,n);
+  c+=`<button class="day" data-act="pick" data-n="${n}" ${i?`data-ph="${i.ph}"`:''} ${n===ui.day?'aria-pressed="true"':'aria-pressed="false"'} ${n===t?'data-today':''} aria-label="${fmt(n,{day:'numeric',month:'long'})}${i?', '+T(PH[i.ph].n):''}">${d}${starts.has(iso(n))?'<b></b>':''}${i&&i.ph==='ovulation'&&i.d===i.ov?'<u></u>':''}</button>`;
+ }
+ const i=info(f,ui.day),isStart=starts.has(iso(ui.day));
+ h+=`<div class="mon"><button data-act="prev" aria-label="${T('Previous month')}">‹</button><h2>${new Date(ui.y,ui.m,1).toLocaleDateString(lang,{month:'long',year:'numeric'})}</h2><button data-act="next" aria-label="${T('Next month')}">›</button></div>
+ <div class="grid">${(lang==='it'?['L','M','M','G','V','S','D']:['M','T','W','T','F','S','S']).map(x=>`<span>${x}</span>`).join('')}${c}</div>
+ <div class="legend">${Object.entries(PH).map(([k,v])=>`<span><i style="background:var(${v.c})"></i>${T(v.n)}</span>`).join('')}<span><i style="background:var(--ovu);border-radius:50%;width:7px;height:7px"></i>${T('Ovulation day')}</span></div>
+ <div class="panel"><h2>${fmt(ui.day,{weekday:'long',day:'numeric',month:'long'})}</h2>
+ <p>${i?T('{ph} phase, day {d} of {L}',{ph:T(PH[i.ph].n),d:i.d,L:i.L})+(ui.day>t?T(' (predicted)'):''):T('No data yet')}${isStart?T('. Period start logged'):''}</p>
+ ${isStart?`<button class="cta alt" data-act="unstart" style="margin-top:0">${T('Remove this period start')}</button>`:`<button class="cta" data-act="start">${T(ui.day===t?'Period started today?':'Period started this day?')}</button>`}</div>`;
+ return h;
+}
+function people(){
+ const inp=(f,k,l,ph,type)=>`<label class="field">${T(l)}<input data-k="${k}" ${type?`type="${type}"`:''} value="${esc(f[k])}" placeholder="${T(ph||'')}"></label>`;
+ return `<h1>${T('Friends')}</h1><p class="sub">${T('Add what she loves. It shows up in the tips on Home. Everything stays on this device.')}</p>`+settings()+
+ st.friends.map(f=>`<article class="card" data-id="${f.id}" style="--c:var(--accent)"><div style="padding:16px">
+ ${inp(f,'name','Name')}${inp(f,'food','Comfort food','e.g. Chocolate')}${inp(f,'drink','Favorite drink','e.g. Chai latte')}${inp(f,'act','Relaxing activity','e.g. Cozy movie night')}${inp(f,'extra','Anything else she loves','e.g. Sunflowers, lo-fi playlists')}
+ <div class="two"><label class="field">${T('Cycle length (days)')}<input data-k="len" type="number" inputmode="numeric" min="21" max="45" value="${f.len}"></label><label class="field">${T('Period length (days)')}<input data-k="plen" type="number" inputmode="numeric" min="2" max="9" value="${f.plen}"></label></div>
+ <p class="note" style="margin:0 0 12px">${T('Cycle length adjusts on its own once you log two or more periods (now {x} days).',{x:cycLen(f)})}</p>
+ <button class="rm" data-act="del">${ui.del===f.id?T('Tap again to remove'):T('Remove {n}',{n:esc(f.name)})}</button></div></article>`).join('')+
+ `<button class="add" data-act="add">${T('+ Add friend')}</button>`;
+}
+function render(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('.tab').forEach(b=>{b.setAttribute('aria-current',b.dataset.tab===ui.tab);b.lastChild.textContent=T({home:'Home',cal:'Calendar',people:'Friends'}[b.dataset.tab])});
+ $('#main').innerHTML=ui.tab==='home'?home():ui.tab==='cal'?cal():people();
+}
+const pref=(f,k)=>(f[k]||'').trim()||T(GEN[k]);
+function events(f,t){
+ const i=info(f,t);if(!i)return[];
+ const v={n:f.name,food:pref(f,'food'),act:pref(f,'act')},o=[];
+ if(i.d===1)o.push(['first','Hey, today is the first day of {n}’s period. Remember to bring her {food}.']);
+ if(i.P>1&&i.d===i.P)o.push(['last','Today is the last day of {n}’s period. Her energy is coming back, so suggest {act}.']);
+ if(i.d===i.ov)o.push(['ovu','It’s {n}’s ovulation day! A good day for a plan together: {act}.']);
+ if(i.d===i.L-4)o.push(['pms','{n}’s PMS phase starts today. Be patient, and bring her {food}.']);
+ return o.map(x=>({k:f.id+':'+x[0]+':'+t,msg:T(x[1],v)}));
+}
+function alerts(t){
+ const ev=st.friends.flatMap(f=>events(f,t));
+ return ev.length?`<div class="alert"><h2>${T('Today’s heads-up')}</h2>${ev.map(e=>`<p>${esc(e.msg)}</p>`).join('')}</div>`:'';
+}
+function settings(){
+ return `<div class="alert"><h2>${T('Language')}</h2><div class="seg"><button data-act="setlang" data-v="en" aria-pressed="${lang==='en'}">English</button><button data-act="setlang" data-v="it" aria-pressed="${lang==='it'}">Italiano</button></div>
+ <h2>${T('Notifications')}</h2>
+ <label class="field">${T('Remind me at')}<input data-s="time" type="time" value="${st.time}"></label>
+ <div class="two"><button class="cta" style="background:var(--accent);color:var(--on)" data-act="notif">${T(st.notif?'Turn off':'Turn on')}</button><button class="cta alt" style="margin-top:0" data-act="test">${T('Send a test')}</button></div>
+ <p class="note">${T('Browsers only allow notifications from a page like this while it’s open (even in the background), and some phones don’t allow them at all. Today’s heads-up always appears at the top of Home.')}</p></div>`;
+}
+function notify(title,body,test){
+ try{
+  if(!('Notification' in window)||Notification.permission!=='granted')throw 0;
+  new Notification(title,{body});return true;
+ }catch(e){if(test)toast(T('Notifications are blocked or not supported here. You’ll still see heads-ups on Home.'));return false}
+}
+async function enableNotif(){
+ try{
+  if(!('Notification' in window))throw 0;
+  const p=Notification.permission==='granted'?'granted':await Notification.requestPermission();
+  if(p!=='granted')throw 0;
+  st.notif=true;save();render();toast(T('Notifications on'));checkNotify();
+ }catch(e){toast(T('Notifications are blocked or not supported here. You’ll still see heads-ups on Home.'))}
+}
+function checkNotify(){
+ if(!st.notif)return;
+ const d=new Date(),hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+ if(hm<st.time)return;
+ let ch=false;
+ for(const f of st.friends)for(const e of events(f,today())){
+  if(st.sent.includes(e.k))continue;
+  if(notify('Cycle Buddy',e.msg)){st.sent.push(e.k);ch=true}
+ }
+ if(ch){st.sent=st.sent.slice(-60);save()}
+}
+function openAdd(){
+ const s=document.createElement('div');s.className='sheet';
+ s.innerHTML=`<div role="dialog" aria-label="${T('Add friend')}"><h2>${T('Add a friend')}</h2>
+ <label class="field">${T('Name')}<input id="an" placeholder="${T('Her name')}"></label>
+ <label class="field">${T('When did her last period start?')}<input id="ad" type="date" value="${iso(today()-10)}"></label>
+ <button class="cta" style="background:var(--accent);color:var(--on)" data-act="save-add">${T('Add friend')}</button>
+ <button class="cta alt" data-act="close">${T('Cancel')}</button></div>`;
+ document.body.appendChild(s);$('#an').focus();
+}
+document.addEventListener('click',e=>{
+ const tb=e.target.closest('.tab');
+ if(tb){ui.tab=tb.dataset.tab;ui.del=null;render();scrollTo(0,0);return}
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const a=b.dataset.act,f=cur(),card=b.closest('[data-id]');
+ if(a==='toggle'){const id=card.dataset.id;ui.open=ui.open===id?null:id;render()}
+ else if(a==='add')openAdd();
+ else if(a==='lang'){lang=st.lang=lang==='it'?'en':'it';save();render()}
+ else if(a==='setlang'){lang=st.lang=b.dataset.v;save();render()}
+ else if(a==='notif'){if(st.notif){st.notif=false;save();render();toast(T('Notifications off'))}else enableNotif()}
+ else if(a==='test')notify('Cycle Buddy',T('This is a test notification from Cycle Buddy.'),true);
+ else if(a==='close')document.querySelector('.sheet').remove();
+ else if(a==='save-add'){
+  const name=$('#an').value.trim();if(!name){$('#an').focus();return}
+  const n={id:uid(),name,food:'',drink:'',act:'',extra:'',len:28,plen:5,starts:[$('#ad').value||iso(today()-10)]};
+  st.friends.push(n);st.sel=n.id;save();document.querySelector('.sheet').remove();
+  if(ui.tab==='people'||ui.tab==='cal'){render()}else{ui.tab='cal';render()}
+  toast(T('{n} added. Fill in her favorites on the Friends page.',{n:name}));
+ }
+ else if(a==='pick'){ui.day=+b.dataset.n;render()}
+ else if(a==='prev'||a==='next'){ui.m+=a==='next'?1:-1;if(ui.m<0){ui.m=11;ui.y--}if(ui.m>11){ui.m=0;ui.y++}render()}
+ else if(a==='start'){const k=iso(ui.day);if(!f.starts.includes(k))f.starts.push(k);f.starts.sort();save();render();toast(T('Period start saved for {n}',{n:f.name}))}
+ else if(a==='unstart'){f.starts=f.starts.filter(x=>x!==iso(ui.day));save();render();toast(T('Period start removed'))}
+ else if(a==='del'){
+  const id=card.dataset.id;
+  if(ui.del===id){st.friends=st.friends.filter(x=>x.id!==id);if(st.sel===id)st.sel=st.friends[0]?st.friends[0].id:null;ui.del=null;save();render()}
+  else{ui.del=id;render()}
+ }
+});
+document.addEventListener('change',e=>{if(e.target.id==='fsel'){st.sel=e.target.value;save();render()}});
+document.addEventListener('visibilitychange',checkNotify);setInterval(checkNotify,6e4);checkNotify();
+document.addEventListener('input',e=>{
+ if(e.target.dataset&&e.target.dataset.s){st[e.target.dataset.s]=e.target.value;save();return}
+ const k=e.target.dataset&&e.target.dataset.k,card=e.target.closest('[data-id]');if(!k||!card)return;
+ const f=st.friends.find(x=>x.id===card.dataset.id);if(!f)return;
+ if(k==='len'||k==='plen'){const v=+e.target.value,r=k==='len'?[21,45]:[2,9];if(v>=r[0]&&v<=r[1])f[k]=v}
+ else f[k]=e.target.value;
+ save();
+});
+render();
+</script>
+</body>
+</html>
